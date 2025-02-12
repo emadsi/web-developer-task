@@ -3,6 +3,7 @@ import { provideRouter } from '@angular/router';
 import { provideStore } from '@ngrx/store';
 import { traineeReducer } from './reducers/trainee.reducer';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -13,6 +14,6 @@ export const appConfig: ApplicationConfig = {
       { path: 'analysis', loadComponent: () => import('./components/analysis-page/analysis-page.component').then(m => m.AnalysisPageComponent) },
       { path: 'monitor', loadComponent: () => import('./components/monitor-page/monitor-page.component').then(m => m.MonitorPageComponent) }
     ]),
-    provideAnimations()
+    provideAnimations(), provideAnimationsAsync()
   ]
 };
