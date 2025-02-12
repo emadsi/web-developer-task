@@ -11,6 +11,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+
 
 
 @Component({
@@ -19,7 +23,10 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
     MatTableModule,
     MatButtonModule,
     MatCardModule,
+    MatInputModule,
     MatDialogModule,
+    FormsModule,
+    MatFormFieldModule,
     MatSnackBarModule
   ],
   templateUrl: './data-page.component.html',
@@ -29,7 +36,7 @@ export class DataPageComponent implements OnInit {
   trainees$: Observable<ITrainee[]> = new Observable<ITrainee[]>();
   dataSource = new MatTableDataSource<ITrainee>([]); // Initialize with empty array
   displayedColumns: string[] = ['id', 'name', 'actions'];
-  selectedFilters = [];
+  selectedFilters = { name: '', id: '' };
 
   constructor(
     private store: Store<TraineeState>, 
@@ -46,17 +53,33 @@ export class DataPageComponent implements OnInit {
     this.trainees$.subscribe(trainees => {
       if (trainees) {
         this.dataSource.data = trainees;
+        this.applyFilters(); // Apply stored filters when data loads
       }
     });
   }
 
-  saveFilters() {
+  saveFilters(): void {
     localStorage.setItem('filters', JSON.stringify(this.selectedFilters));
+    this.applyFilters();
   }
 
-  loadFilters() {
+  loadFilters(): void {
     const saved = localStorage.getItem('filters');
-    if (saved) this.selectedFilters = JSON.parse(saved);
+    if (saved) {
+      this.selectedFilters = JSON.parse(saved);
+    }
+  }
+
+  applyFilters(): void {
+    this.dataSource.filterPredicate = (data: ITrainee, filter: string) => {
+      const filterObj = JSON.parse(filter);
+      return (
+        (filterObj.name ? data.name.toLowerCase().includes(filterObj.name.toLowerCase()) : true) &&
+        (filterObj.id ? data.id.toString().includes(filterObj.id) : true)
+      );
+    };
+
+    this.dataSource.filter = JSON.stringify(this.selectedFilters);
   }
 
   removeTrainee(id: number): void {

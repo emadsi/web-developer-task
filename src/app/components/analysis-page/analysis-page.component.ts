@@ -45,10 +45,8 @@ export class AnalysisPageComponent implements OnInit {
 
   getFilteredData(trainees: ITrainee[]) {
     return trainees
-      ? trainees
-        .filter(t => this.selectedTraineeIds.includes(t.id))
-        .flatMap(t => t.tests)
-        .filter(test => this.selectedSubjects.includes(test.subject))
+      ? trainees.filter(t => this.selectedTraineeIds.includes(t.id))
+        .flatMap(t => t.tests).filter(test => this.selectedSubjects.includes(test.subject))
         .map(test => ({
           name: test.subject,
           value: test.grade
