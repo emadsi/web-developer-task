@@ -1,0 +1,25 @@
+<mat-card>
+    <h2>Analysis Page</h2>
+
+    <mat-form-field>
+        <mat-label>Select Trainees</mat-label>
+        <mat-select [(ngModel)]="selectedTraineeIds" multiple>
+            <mat-option *ngFor="let trainee of (trainees$ | async)" [value]="trainee.id">
+                {{ trainee.name }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field>
+        <mat-label>Select Subjects</mat-label>
+        <mat-select [(ngModel)]="selectedSubjects" multiple>
+            <mat-option value="Math">Math</mat-option>
+            <mat-option value="Science">Science</mat-option>
+            <mat-option value="English">English</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <ngx-charts-bar-vertical [results]="getFilteredData(trainees$ | async)" [xAxis]="true" [yAxis]="true"
+        [legend]="true" [showDataLabel]="true">
+    </ngx-charts-bar-vertical>
+</mat-card>
