@@ -19,7 +19,7 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef> Actions </th>
       <td mat-cell *matCellDef="let trainee">
-        <button mat-button (click)="removeTrainee(trainee.id)">Remove</button>
+        <button mat-button color="warn" (click)="removeTrainee(trainee.id)">Remove</button>
       </td>
     </ng-container>
 

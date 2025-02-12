@@ -1,4 +1,4 @@
-# Test Results App
+# Web Developer Assessment
 
 A Single Page Application built with **Angular 17**, **NgRx for state management**, and **Jest for testing**.
 
