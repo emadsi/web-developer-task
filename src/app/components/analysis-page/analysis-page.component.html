@@ -1,25 +1,51 @@
 <mat-card>
     <h2>Analysis Page</h2>
-
-    <mat-form-field>
-        <mat-label>Select Trainees</mat-label>
-        <mat-select [(ngModel)]="selectedTraineeIds" multiple>
-            <mat-option *ngFor="let trainee of (trainees$ | async)" [value]="trainee.id">
-                {{ trainee.name }}
-            </mat-option>
-        </mat-select>
+  
+    <!-- Trainee Selection -->
+    <mat-form-field appearance="outline">
+      <mat-label>Select Trainee IDs</mat-label>
+      <mat-select [(ngModel)]="selectedTraineeIds" multiple (selectionChange)="loadCharts()">
+        <mat-option *ngFor="let trainee of trainees()" [value]="trainee.id">
+          {{ trainee.name }} (ID: {{ trainee.id }})
+        </mat-option>
+      </mat-select>
     </mat-form-field>
-
-    <mat-form-field>
-        <mat-label>Select Subjects</mat-label>
-        <mat-select [(ngModel)]="selectedSubjects" multiple>
-            <mat-option value="Math">Math</mat-option>
-            <mat-option value="Science">Science</mat-option>
-            <mat-option value="English">English</mat-option>
-        </mat-select>
+  
+    <!-- Subject Selection -->
+    <mat-form-field appearance="outline">
+      <mat-label>Select Subjects</mat-label>
+      <mat-select [(ngModel)]="selectedSubjects" multiple (selectionChange)="updateSubjects()">
+        <mat-option *ngFor="let trainee of trainees()" [value]="trainee.subject">
+          {{ trainee.subject }}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
-
-    <ngx-charts-bar-vertical [results]="getFilteredData(trainees$ | async)" [xAxis]="true" [yAxis]="true"
-        [legend]="true" [showDataLabel]="true">
-    </ngx-charts-bar-vertical>
-</mat-card>
+  
+    <!-- Chart Container -->
+    <div class="chart-container">
+      <div class="chart-box" *ngFor="let chart of chartData; let i = index" cdkDropList>
+        <h3>{{ chart.name }}</h3>
+        <ngx-charts-bar-vertical
+          [results]="chart.series"
+          [scheme]="'cool'"
+          [xAxis]="true"
+          [yAxis]="true"
+          [legend]="true">
+        </ngx-charts-bar-vertical>
+        <button mat-button color="accent" (click)="swapCharts(i)">Swap with Bottom Chart</button>
+      </div>
+    </div>
+  
+    <!-- Bottom Hidden Chart Button -->
+    <mat-card class="bottom-chart">
+      <h3>Hidden Chart</h3>
+      <ngx-charts-bar-vertical *ngIf="bottomChart"
+        [results]="bottomChart.series"
+        [scheme]="'cool'"
+        [xAxis]="true"
+        [yAxis]="true"
+        [legend]="true">
+      </ngx-charts-bar-vertical>
+    </mat-card>
+  </mat-card>
+  

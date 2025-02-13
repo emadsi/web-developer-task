@@ -1,0 +1,21 @@
+:host {
+
+    mat-card {
+        margin: 20px;
+    }
+    
+    .filter-container {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    
+    table {
+        width: 100%;
+    }
+    
+    .mat-column-id,
+    .mat-column-name {
+        padding: 8px;
+    }
+}

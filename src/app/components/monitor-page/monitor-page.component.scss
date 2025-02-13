@@ -1,0 +1,29 @@
+:host {
+    mat-card {
+        margin: 20px;
+        padding: 20px;
+    }
+      
+    .filter-container {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        align-items: center;
+    }
+      
+    .status {
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+      
+    .passed {
+        color: white;
+        background-color: green;
+    }
+      
+    .failed {
+        color: white;
+        background-color: red;
+    } 
+}
