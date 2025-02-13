@@ -77,39 +77,59 @@
 
 <!-- Detail Panel -->
 <mat-sidenav-container *ngIf="selectedTrainee" class="detail-panel-container">
-  <mat-sidenav mode="side" position="end" [opened]="selectedTrainee !== null">
-    <mat-card *ngIf="selectedTrainee">
+  <mat-sidenav #detailsPanel mode="side" position="end">
+    <mat-card *ngIf="traineeForm.value">
       <h3>{{ isNewTrainee ? 'Add New Trainee' : 'Trainee Details' }}</h3>
 
       <form [formGroup]="traineeForm">
         <mat-form-field>
+          <mat-label>ID</mat-label>
+          <input matInput type="number" formControlName="id">
+        </mat-form-field>
+
+        <mat-form-field>
           <mat-label>Name</mat-label>
-          <input matInput formControlName="name">
+          <input matInput type="text" formControlName="name">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Grade</mat-label>
+          <input matInput type="number" formControlName="grade">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Email</mat-label>
-          <input matInput formControlName="email">
+          <input matInput type="text" formControlName="email">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Date Joined</mat-label>
+          <input matInput type="date" formControlName="date">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Address</mat-label>
-          <input matInput formControlName="address">
+          <input matInput type="text" formControlName="address">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>City</mat-label>
-          <input matInput formControlName="city">
+          <input matInput type="text" formControlName="city">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Country</mat-label>
-          <input matInput formControlName="country">
+          <input matInput type="text" formControlName="country">
         </mat-form-field>
 
         <mat-form-field>
           <mat-label>Zip</mat-label>
           <input matInput type="number" formControlName="zip">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Subject</mat-label>
+          <input matInput type="text" formControlName="subject">
         </mat-form-field>
 
         <div class="button-group">

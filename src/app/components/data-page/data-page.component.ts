@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -28,7 +28,7 @@ import { ITestResult } from '../../models/testResult.model';
   templateUrl: './data-page.component.html',
   styleUrls: ['./data-page.component.scss']
 })
-export class DataPageComponent implements OnInit {
+export class DataPageComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['id', 'name', 'subject', 'grade', 'date', 'actions'];
   dataSource = new MatTableDataSource<{ trainee: ITrainee; test: ITestResult }>([]);
   filterForm!: FormGroup;
@@ -37,7 +37,7 @@ export class DataPageComponent implements OnInit {
   isNewTrainee = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild('detailsPanel') detailsPanel: MatSidenav;
+  @ViewChild('detailsPanel') detailsPanel!: MatSidenav;
 
   constructor(
     private traineeService: TraineeService,
@@ -49,6 +49,10 @@ export class DataPageComponent implements OnInit {
     this.initializeForms();
     this.loadTrainees();
     this.loadFilters();
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
   }
 
   private initializeForms(): void {
