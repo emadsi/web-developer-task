@@ -1,21 +1,42 @@
 :host {
 
-    mat-card {
+    display: block;
+    height: 100vh;
+    
+    .mat-card {
         margin: 20px;
+        padding: 20px;
     }
     
-    .filter-container {
+    .filter-form {
         display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
     }
     
-    table {
+    .table-container {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+    
+    mat-form-field {
+        width: 200px;
+    }
+    
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+    
+    .detail-panel-container {
         width: 100%;
     }
     
-    .mat-column-id,
-    .mat-column-name {
-        padding: 8px;
-    }
+    mat-sidenav {
+        width: 350px;
+        padding: 20px;
+        background: #f9f9f9;
+    }      
 }

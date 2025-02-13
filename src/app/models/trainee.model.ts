@@ -11,4 +11,5 @@ export interface ITrainee {
     tests: ITestResult[];
     average: number;
 }
+
   

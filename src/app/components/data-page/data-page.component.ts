@@ -1,87 +1,87 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { ITrainee } from '../../models/trainee.model';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatInputModule } from '@angular/material/input';
-import { TraineeService } from '../../services/trainee.service';
-import { MatSelectModule } from '@angular/material/select';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
-import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { CommonModule } from '@angular/common';
+import { ITrainee } from '../../models/trainee.model';
+import { TraineeService } from '../../services/trainee.service';
+import { MatCardModule } from '@angular/material/card';
 import { ITestResult } from '../../models/testResult.model';
-import { MOCK_TRAINEES } from '../../mocks/trainees.mock';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-data-page',
-  standalone: true,
   imports: [
+    CommonModule,
     MatTableModule,
-    MatCardModule,
-    NgIf,
     MatPaginatorModule,
+    MatSidenavModule,
+    MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatExpansionModule,
-    MatSnackBarModule,
     ReactiveFormsModule,
-    MatSidenavModule
+    MatCardModule
   ],
   templateUrl: './data-page.component.html',
-  styleUrls: ['./data-page.component.scss'],
-  providers: [TraineeService]
+  styleUrls: ['./data-page.component.scss']
 })
 export class DataPageComponent implements OnInit {
-  displayedColumns: string[] = ['id', 'name', 'date', 'grade', 'subject', 'actions'];
+  displayedColumns: string[] = ['id', 'name', 'subject', 'grade', 'date', 'actions'];
   dataSource = new MatTableDataSource<{ trainee: ITrainee; test: ITestResult }>([]);
-  filterForm: FormGroup;
+  filterForm!: FormGroup;
+  traineeForm!: FormGroup;
   selectedTrainee: ITrainee | null = null;
+  isNewTrainee = false;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild('detailsPanel') detailsPanel: MatSidenav;
 
   constructor(
-    private dialog: MatDialog, 
-    private snackBar: MatSnackBar, 
     private traineeService: TraineeService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.initializeFilters();
-    this.loadTraineesData();
+    this.initializeForms();
+    this.loadTrainees();
     this.loadFilters();
   }
 
-  initializeFilters(): void {
+  private initializeForms(): void {
     this.filterForm = this.fb.group({
-      id: [''],
+      id: [null],
       gradeMin: [null],
       gradeMax: [null],
       dateFrom: [''],
       dateTo: ['']
     });
-  }
 
-  loadTraineesData(): void {
-    this.traineeService.getAllTrainees().subscribe(trainees => {
-      if (trainees) {
-        this.dataSource.data = this.flattenData(trainees);
-        setTimeout(() => {
-          this.dataSource.paginator = this.paginator;
-        });
-      }
+    this.traineeForm = this.fb.group({
+      id: [{ value: null, disabled: true }],
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      address: [''],
+      city: [''],
+      country: [''],
+      zip: [null],
+      grade: [null],
+      date: [null],
+      subject: ['']
     });
   }
 
-  flattenData(trainees: ITrainee[]): { trainee: ITrainee; test: ITestResult }[] {
+  private loadTrainees(): void {
+    this.traineeService.getAllTrainees().subscribe(trainees => {
+      this.dataSource.data = this.flattenData(trainees);
+      this.dataSource.paginator = this.paginator;
+    });
+  }
+
+  private flattenData(trainees: ITrainee[]): { trainee: ITrainee; test: ITestResult }[] {
     return trainees.flatMap(trainee =>
       trainee.tests.map(test => ({
         trainee,
@@ -92,26 +92,23 @@ export class DataPageComponent implements OnInit {
 
   applyFilter(): void {
     const { id, gradeMin, gradeMax, dateFrom, dateTo } = this.filterForm.value;
-    this.dataSource.filterPredicate = (data: { trainee: ITrainee; test: ITestResult }, filter: string) => {
-      return (
-        (!id || data.trainee.id.toString().includes(id)) &&
-        (!gradeMin || data.trainee.average >= gradeMin) &&
-        (!gradeMax || data.trainee.average <= gradeMax) &&
-        (!dateFrom || new Date(data.test.date) >= new Date(dateFrom)) &&
-        (!dateTo || new Date(data.test.date) <= new Date(dateTo))
-      );
+    this.dataSource.filterPredicate = (data, filter) => {
+      const matchesId = id ? data.trainee.id.toString() === id.toString() : true;
+      const matchesGradeMin = gradeMin ? data.test.grade >= gradeMin : true;
+      const matchesGradeMax = gradeMax ? data.test.grade <= gradeMax : true;
+      const matchesDateFrom = dateFrom ? new Date(data.test.date) >= new Date(dateFrom) : true;
+      const matchesDateTo = dateTo ? new Date(data.test.date) <= new Date(dateTo) : true;
+      return matchesId && matchesGradeMin && matchesGradeMax && matchesDateFrom && matchesDateTo;
     };
-    this.dataSource.filter = JSON.stringify(this.filterForm.value);
+    this.dataSource.filter = '' + Math.random();
     this.saveFilters();
   }
 
-  saveFilters(): void {
+  private saveFilters(): void {
     localStorage.setItem('dataPageFilters', JSON.stringify(this.filterForm.value));
   }
 
-  loadFilters(): void {
-    if (!this.filterForm) return;
-
+  private loadFilters(): void {
     const savedFilters = localStorage.getItem('dataPageFilters');
     if (savedFilters) {
       this.filterForm.setValue(JSON.parse(savedFilters));
@@ -119,31 +116,55 @@ export class DataPageComponent implements OnInit {
     }
   }
 
-  openDetails(trainee: ITrainee): void {
-    this.selectedTrainee = trainee;
+  openDetails(trainee: ITrainee | null, test: ITestResult |null, isNew: boolean = false): void {
+    this.isNewTrainee = isNew;
+    if (trainee) {
+      this.fillTraineeForm(trainee, test);
+      this.selectedTrainee = trainee;
+    } else {
+      this.traineeForm.reset();
+      this.selectedTrainee = null;
+    }
+    this.detailsPanel.open();
+    this.cdr.detectChanges();
+  }
+
+  private fillTraineeForm(trainee: ITrainee, test: ITestResult) {
+    this.traineeForm = this.fb.group({
+      id: [{ value: trainee.id, disabled: true }],
+      name: [ trainee.name, Validators.required],
+      email: [trainee.email, [Validators.required, Validators.email]],
+      address: [trainee.address],
+      city: [trainee.city],
+      country: [trainee.country],
+      zip: [trainee.zip],
+      grade: [test.grade],
+      date: [test.date],
+      subject: [test.subject]
+    })
   }
 
   closeDetails(): void {
-    this.selectedTrainee = null;
+    this.detailsPanel.close();
+    this.traineeForm.reset();
+    this.isNewTrainee = false;
   }
 
-  addTrainee(trainee: ITrainee): void {
-    MOCK_TRAINEES.push(trainee);
-    this.snackBar.open('Added new trainee!', 'Close', { duration: 3000 });
-  }
-
-  deleteTrainee(id: number): void {
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: { message: 'Are you sure you want to delete this trainee?' }
-    });
-    
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.traineeService.deleteTrainee(id).subscribe(() => {
-          this.loadTraineesData();
-          this.snackBar.open(`Trainee ${id} removed`, 'Close', { duration: 3000 });
+  saveTrainee(): void {
+    if (this.traineeForm.valid) {
+      const traineeData = this.traineeForm.getRawValue();
+      if (this.isNewTrainee) {
+        this.traineeService.addTrainee(traineeData).subscribe(() => {
+          this.loadTrainees();
+          this.closeDetails();
+        });
+      } else {
+        this.traineeService.updateTrainee(traineeData.id, traineeData).subscribe(() => {
+          this.loadTrainees();
+          this.closeDetails();
         });
       }
-    });
+    }
   }
 }
+
