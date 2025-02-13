@@ -1,51 +1,38 @@
 <mat-card>
-    <h2>Analysis Page</h2>
-  
-    <!-- Trainee Selection -->
-    <mat-form-field appearance="outline">
+  <h2>Analysis Page</h2>
+
+  <!-- Filters -->
+  <form [formGroup]="filterForm">
+    <mat-form-field>
       <mat-label>Select Trainee IDs</mat-label>
-      <mat-select [(ngModel)]="selectedTraineeIds" multiple (selectionChange)="loadCharts()">
+      <mat-select formControlName="traineeIds" multiple>
         <mat-option *ngFor="let trainee of trainees()" [value]="trainee.id">
-          {{ trainee.name }} (ID: {{ trainee.id }})
+          {{ trainee.id }} - {{ trainee.name }}
         </mat-option>
       </mat-select>
     </mat-form-field>
-  
-    <!-- Subject Selection -->
-    <mat-form-field appearance="outline">
+
+    <mat-form-field>
       <mat-label>Select Subjects</mat-label>
-      <mat-select [(ngModel)]="selectedSubjects" multiple (selectionChange)="updateSubjects()">
-        <mat-option *ngFor="let trainee of trainees()" [value]="trainee.subject">
-          {{ trainee.subject }}
+      <mat-select formControlName="subjects" multiple>
+        <mat-option *ngFor="let subject of subjects()" [value]="subject">
+          {{ subject }}
         </mat-option>
       </mat-select>
     </mat-form-field>
-  
-    <!-- Chart Container -->
-    <div class="chart-container">
-      <div class="chart-box" *ngFor="let chart of chartData; let i = index" cdkDropList>
-        <h3>{{ chart.name }}</h3>
-        <ngx-charts-bar-vertical
-          [results]="chart.series"
-          [scheme]="'cool'"
-          [xAxis]="true"
-          [yAxis]="true"
-          [legend]="true">
-        </ngx-charts-bar-vertical>
-        <button mat-button color="accent" (click)="swapCharts(i)">Swap with Bottom Chart</button>
-      </div>
+  </form>
+
+  <!-- Drag and Drop Charts -->
+  <div cdkDropList (cdkDropListDropped)="swapCharts($event)">
+    <div *ngFor="let chart of displayedCharts(); let i = index" cdkDrag>
+      <mat-card>
+        <h3>{{ chart }}</h3>
+        <!-- Placeholder for chart implementation -->
+        <canvas id="chart{{i}}"></canvas>
+      </mat-card>
     </div>
-  
-    <!-- Bottom Hidden Chart Button -->
-    <mat-card class="bottom-chart">
-      <h3>Hidden Chart</h3>
-      <ngx-charts-bar-vertical *ngIf="bottomChart"
-        [results]="bottomChart.series"
-        [scheme]="'cool'"
-        [xAxis]="true"
-        [yAxis]="true"
-        [legend]="true">
-      </ngx-charts-bar-vertical>
-    </mat-card>
-  </mat-card>
-  
+  </div>
+
+  <!-- Hidden Chart Replacement -->
+  <button mat-button (click)="replaceChart()">Replace with {{ hiddenChart() }}</button>
+</mat-card>

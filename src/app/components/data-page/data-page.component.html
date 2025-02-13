@@ -2,12 +2,30 @@
   <h2>Trainee Test Results</h2>
 
   <!-- Filter Input -->
-  <mat-form-field appearance="outline">
+  <!-- <mat-form-field appearance="outline" [formGroup]="filterForm">
     <mat-label>Filter (e.g., "ID:1", "Math", ">80")</mat-label>
-    <input matInput [(ngModel)]="filterValue" (input)="applyFilter()">
-  </mat-form-field>
+    <input matInput [FormGroup]="filterValue" (input)="applyFilter()">
+  </mat-form-field> -->
+  <form [formGroup]="filterForm">
+    <mat-form-field>
+      <mat-label>Filter by ID</mat-label>
+      <input matInput formControlName="id" placeholder="Enter ID">
+    </mat-form-field>
 
-  <!-- Table -->
+    <mat-form-field>
+      <mat-label>Grade Min</mat-label>
+      <input matInput type="number" formControlName="gradeMin">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-label>Grade Max</mat-label>
+      <input matInput type="number" formControlName="gradeMax">
+    </mat-form-field>
+
+    <button mat-button color="primary" (click)="applyFilter()">Apply Filter</button>
+  </form>
+
+  <!--Data Table -->
   <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
     
     <!-- ID Column -->

@@ -61,9 +61,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { AsyncPipe, NgForOf } from '@angular/common';
-import { DragDropModule } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatTableDataSource } from '@angular/material/table';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ITrainee } from '../../models/trainee.model';
+import { TraineeService } from '../../services/trainee.service';
+import { MatButtonModule } from '@angular/material/button';
 
 interface ChartData {
   name: string;
@@ -75,55 +78,79 @@ interface ChartData {
   standalone: true,
   imports: [
     NgForOf,
-    MatSelectModule,
-    FormsModule,
     MatFormFieldModule,
-    MatCardModule,
-    NgxChartsModule,
-    DragDropModule
+    MatSelectModule,
+    MatButtonModule,
+    ReactiveFormsModule,
+    DragDropModule,
+    MatCardModule
   ],
   templateUrl: './analysis-page.component.html',
   styleUrls: ['./analysis-page.component.scss']
 })
 export class AnalysisPageComponent implements OnInit {
-  trainees = signal([
-    { id: 1, name: 'John Doe', subject: 'Math', grade: 85 },
-    { id: 2, name: 'Jane Doe', subject: 'Science', grade: 78 },
-    { id: 3, name: 'Alice Smith', subject: 'English', grade: 92 }
-  ]);
+  trainees = signal<ITrainee[]>([]);
+  subjects = signal<string[]>([]);
+  filterForm: FormGroup;
+  displayedCharts = signal<string[]>(['Chart 1', 'Chart 3']);
+  hiddenChart = signal<string>('Chart 2');
 
-  selectedTraineeIds = signal<number[]>([]);
-  selectedSubjects = signal<string[]>([]);
-  chartData: ChartData[] = [];
-  bottomChart: ChartData | null = null;
+  constructor(private traineeService: TraineeService, private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    this.loadCharts();
+    this.loadTrainees();
+    this.filterForm = this.fb.group({
+      traineeIds: [[]],
+      subjects: [[]]
+    });
   }
 
-  loadCharts(): void {
-    this.chartData = this.trainees()
-      .filter(t => this.selectedTraineeIds().includes(t.id))
-      .map(t => ({
-        name: t.name,
-        series: [{ name: t.subject, value: t.grade }]
-      }));
+  loadTrainees(): void {
+    this.traineeService.getAllTrainees().subscribe(data => {
+      this.trainees.set(data);
+      const uniqueSubjects = new Set<string>();
+      data.forEach(trainee => trainee.tests.forEach(test => uniqueSubjects.add(test.subject)));
+      this.subjects.set(Array.from(uniqueSubjects));
+    });
   }
 
-  updateSubjects(): void {
-    this.chartData = this.trainees()
-      .filter(t => this.selectedSubjects().includes(t.subject))
-      .map(t => ({
-        name: t.subject,
-        series: [{ name: t.name, value: t.grade }]
-      }));
+  swapCharts(event: CdkDragDrop<string[]>): void {
+    const updatedCharts = [...this.displayedCharts()];
+    moveItemInArray(updatedCharts, event.previousIndex, event.currentIndex);
+    this.displayedCharts.set(updatedCharts);
   }
 
-  swapCharts(index: number): void {
-    if (this.bottomChart) {
-      const temp = this.chartData[index];
-      this.chartData[index] = this.bottomChart;
-      this.bottomChart = temp;
-    }
+  replaceChart(): void {
+    const updatedCharts = [...this.displayedCharts()];
+    const tempChart = updatedCharts[1];
+    updatedCharts[1] = this.hiddenChart();
+    this.hiddenChart.set(tempChart);
+    this.displayedCharts.set(updatedCharts);
   }
+
+  // loadCharts(): void {
+  //   this.chartData = this.trainees()
+  //     .filter(t => this.selectedTraineeIds().includes(t.id))
+  //     .map(t => ({
+  //       name: t.name,
+  //       series: [{ name: t.subject, value: t.grade }]
+  //     }));
+  // }
+
+  // updateSubjects(): void {
+  //   this.chartData = this.trainees()
+  //     .filter(t => this.selectedSubjects().includes(t.subject))
+  //     .map(t => ({
+  //       name: t.subject,
+  //       series: [{ name: t.name, value: t.grade }]
+  //     }));
+  // }
+
+  // swapCharts(index: number): void {
+  //   if (this.bottomChart) {
+  //     const temp = this.chartData[index];
+  //     this.chartData[index] = this.bottomChart;
+  //     this.bottomChart = temp;
+  //   }
+  // }
 }

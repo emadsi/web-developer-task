@@ -2,29 +2,20 @@
     <h2>Monitor Page</h2>
   
     <!-- Filters -->
-    <div class="filter-container">
-      <!-- ID Multi-Select -->
-      <mat-form-field appearance="outline">
-        <mat-label>Filter by IDs</mat-label>
-        <mat-select [(ngModel)]="filterValues().id" multiple (selectionChange)="applyFilter()">
-          <mat-option *ngFor="let trainee of traineeList()" [value]="trainee.id">
-            {{ trainee.id }} ({{ trainee.name }})
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
+    <!-- Filters -->
+  <form [formGroup]="filterForm">
+    <mat-form-field>
+      <mat-label>Filter by Name</mat-label>
+      <input matInput formControlName="name" placeholder="Enter Name">
+    </mat-form-field>
+
+    <mat-checkbox formControlName="showPassed" (change)="applyFilter()">Show Passed</mat-checkbox>
+    <mat-checkbox formControlName="showFailed" (change)="applyFilter()">Show Failed</mat-checkbox>
+
+    <button mat-button color="primary" (click)="applyFilter()">Apply Filter</button>
+  </form>
   
-      <!-- Name Search -->
-      <mat-form-field appearance="outline">
-        <mat-label>Filter by Name</mat-label>
-        <input matInput [(ngModel)]="filterValues.name" (input)="applyFilter()">
-      </mat-form-field>
-  
-      <!-- Passed/Failed Checkboxes -->
-      <mat-checkbox [(ngModel)]="filterValues().showPassed" (change)="applyFilter()">Show Passed</mat-checkbox>
-      <mat-checkbox [(ngModel)]="filterValues().showFailed" (change)="applyFilter()">Show Failed</mat-checkbox>
-    </div>
-  
-    <!-- Table -->
+    <!-- Data Table -->
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
       
       <!-- ID Column -->
