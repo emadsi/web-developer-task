@@ -105,7 +105,7 @@ export class AnalysisPageComponent implements OnInit {
     });
   }
 
-  loadTrainees(): void {
+  private loadTrainees(): void {
     this.traineeService.getAllTrainees().subscribe(data => {
       this.trainees.set(data);
       const uniqueSubjects = new Set<string>();

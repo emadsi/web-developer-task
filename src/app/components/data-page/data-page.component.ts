@@ -1,22 +1,22 @@
-import { Component, OnInit, ViewChild, signal } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { ITrainee } from '../../models/trainee.model';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { TraineeState } from '../../reducers/trainee.reducer';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatInputModule } from '@angular/material/input';
 import { TraineeService } from '../../services/trainee.service';
-import { AsyncPipe, NgForOf } from '@angular/common';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
+import { ITestResult } from '../../models/testResult.model';
+import { MOCK_TRAINEES } from '../../mocks/trainees.mock';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-data-page',
@@ -24,6 +24,7 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
   imports: [
     MatTableModule,
     MatCardModule,
+    NgIf,
     MatPaginatorModule,
     MatFormFieldModule,
     MatInputModule,
@@ -31,7 +32,8 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
     MatButtonModule,
     MatExpansionModule,
     MatSnackBarModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    MatSidenavModule
   ],
   templateUrl: './data-page.component.html',
   styleUrls: ['./data-page.component.scss'],
@@ -39,24 +41,26 @@ import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.compone
 })
 export class DataPageComponent implements OnInit {
   displayedColumns: string[] = ['id', 'name', 'date', 'grade', 'subject', 'actions'];
-  dataSource = new MatTableDataSource<ITrainee>([]);
-  expandedElement: ITrainee | null = null;
-  trainees = signal<ITrainee[]>([]);
+  dataSource = new MatTableDataSource<{ trainee: ITrainee; test: ITestResult }>([]);
   filterForm: FormGroup;
+  selectedTrainee: ITrainee | null = null;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(
     private dialog: MatDialog, 
     private snackBar: MatSnackBar, 
-    private store: Store<TraineeState>, 
     private traineeService: TraineeService,
     private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
+    this.initializeFilters();
     this.loadTraineesData();
     this.loadFilters();
+  }
+
+  initializeFilters(): void {
     this.filterForm = this.fb.group({
       id: [''],
       gradeMin: [null],
@@ -69,24 +73,32 @@ export class DataPageComponent implements OnInit {
   loadTraineesData(): void {
     this.traineeService.getAllTrainees().subscribe(trainees => {
       if (trainees) {
-        this.trainees.set(trainees);
-        this.dataSource = new MatTableDataSource<ITrainee>(trainees);
-        this.dataSource.paginator = this.paginator;
-        // this.dataSource.filterPredicate = this.createFilter();
-        // this.applyFilter(); // Apply stored filters when data loads
+        this.dataSource.data = this.flattenData(trainees);
+        setTimeout(() => {
+          this.dataSource.paginator = this.paginator;
+        });
       }
     });
   }
 
+  flattenData(trainees: ITrainee[]): { trainee: ITrainee; test: ITestResult }[] {
+    return trainees.flatMap(trainee =>
+      trainee.tests.map(test => ({
+        trainee,
+        test
+      }))
+    );
+  }
+
   applyFilter(): void {
     const { id, gradeMin, gradeMax, dateFrom, dateTo } = this.filterForm.value;
-    this.dataSource.filterPredicate = (data: ITrainee, filter: string) => {
+    this.dataSource.filterPredicate = (data: { trainee: ITrainee; test: ITestResult }, filter: string) => {
       return (
-        (!id || data.id.toString().includes(id)) &&
-        (!gradeMin || data.average >= gradeMin) &&
-        (!gradeMax || data.average <= gradeMax) &&
-        (!dateFrom || new Date(data.tests[0].date) >= new Date(dateFrom)) &&
-        (!dateTo || new Date(data.tests[0].date) <= new Date(dateTo))
+        (!id || data.trainee.id.toString().includes(id)) &&
+        (!gradeMin || data.trainee.average >= gradeMin) &&
+        (!gradeMax || data.trainee.average <= gradeMax) &&
+        (!dateFrom || new Date(data.test.date) >= new Date(dateFrom)) &&
+        (!dateTo || new Date(data.test.date) <= new Date(dateTo))
       );
     };
     this.dataSource.filter = JSON.stringify(this.filterForm.value);
@@ -98,6 +110,8 @@ export class DataPageComponent implements OnInit {
   }
 
   loadFilters(): void {
+    if (!this.filterForm) return;
+
     const savedFilters = localStorage.getItem('dataPageFilters');
     if (savedFilters) {
       this.filterForm.setValue(JSON.parse(savedFilters));
@@ -105,24 +119,16 @@ export class DataPageComponent implements OnInit {
     }
   }
 
-  // createFilter(): (data: ITrainee, filter: string) => boolean {
-  //   return (data: ITrainee, filter: string): boolean => {
-  //     const filters = filter.toLowerCase().split(' ');
-  //     return filters.every(term =>
-  //       data.name.toLowerCase().includes(term) ||
-  //       data.tests.some(test => test.subject.toLowerCase().includes(term)) ||
-  //       data.id.toString().includes(term) ||
-  //       (term.includes('>') && data.tests.some(test => test.grade > parseInt(term.replace('>', ''), 10))) ||
-  //       (term.includes('>') && data.tests.some(test => test.grade < parseInt(term.replace('<', ''), 10)))
-  //     );
-  //   };
-  // }
-
-  toggleDetailPanel(row: ITrainee): void {
-    this.expandedElement = this.expandedElement === row ? null : row;
+  openDetails(trainee: ITrainee): void {
+    this.selectedTrainee = trainee;
   }
 
-  addTrainee(): void {
+  closeDetails(): void {
+    this.selectedTrainee = null;
+  }
+
+  addTrainee(trainee: ITrainee): void {
+    MOCK_TRAINEES.push(trainee);
     this.snackBar.open('Added new trainee!', 'Close', { duration: 3000 });
   }
 
