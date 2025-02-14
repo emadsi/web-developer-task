@@ -1,29 +1,50 @@
 :host {
-    mat-card {
-        margin: 20px;
-        padding: 20px;
+    .monitor-page-container {
+         margin: 20px;
+         padding: 20px;
     }
-      
-    .filter-container {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-        align-items: center;
+    
+    /* Filters */
+    .filters {
+         display: flex;
+         flex-wrap: wrap;
+         gap: 15px;
+         margin-bottom: 20px;
     }
-      
-    .status {
-        font-weight: bold;
-        padding: 5px 10px;
-        border-radius: 5px;
+    
+    mat-form-field {
+         width: 250px;
     }
-      
+    
+    /* Checkboxes */
+    .checkbox-group {
+         display: flex;
+         gap: 10px;
+    }
+ 
+    /* Table Styling */
+    .trainee-table {
+         width: 100%;
+         margin-top: 15px;
+         border-collapse: collapse;
+    }
+    
+    th {
+         background: #f4f4f4;
+         font-weight: bold;
+    }
+    
+    td, th {
+         padding: 10px;
+         text-align: left;
+    }
+ 
+    /* Passed/Failed Row Styling */
     .passed {
-        color: white;
-        background-color: green;
+         background-color: rgba(76, 175, 80, 0.2); /* Light green */
     }
-      
+ 
     .failed {
-        color: white;
-        background-color: red;
-    } 
-}
+         background-color: rgba(244, 67, 54, 0.2); /* Light red */
+    }
+ } 

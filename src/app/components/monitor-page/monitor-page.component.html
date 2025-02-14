@@ -1,67 +1,63 @@
-<mat-card>
-    <h2>Monitor Page</h2>
-  
-    <!-- Filters -->
-    <!-- Filters -->
-  <form [formGroup]="filterForm">
-    <mat-form-field>
-      <mat-label>Filter by Name</mat-label>
-      <input matInput formControlName="name" placeholder="Enter Name">
+<mat-card class="monitor-page-container">
+  <h2>Monitor Trainees</h2>
+
+  <!-- Filters -->
+  <form [formGroup]="filterForm" class="filters">
+    <!-- Multi-select for Trainee IDs -->
+    <mat-form-field appearance="outline">
+      <mat-label>Select Trainee IDs</mat-label>
+      <mat-select formControlName="traineeIds" multiple>
+        <mat-option *ngFor="let trainee of trainees()" [value]="trainee.id">
+          {{ trainee.id }} - {{ trainee.name }}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
 
-    <mat-checkbox formControlName="showPassed" (change)="applyFilter()">Show Passed</mat-checkbox>
-    <mat-checkbox formControlName="showFailed" (change)="applyFilter()">Show Failed</mat-checkbox>
+    <!-- Name Filter -->
+    <mat-form-field appearance="outline">
+      <mat-label>Search by Name</mat-label>
+      <input matInput formControlName="name" placeholder="Type a name">
+    </mat-form-field>
 
-    <button mat-button color="primary" (click)="applyFilter()">Apply Filter</button>
+    <!-- Passed/Failed Filters -->
+    <div class="checkbox-group">
+      <mat-checkbox formControlName="showPassed">Show Passed</mat-checkbox>
+      <mat-checkbox formControlName="showFailed">Show Failed</mat-checkbox>
+    </div>
+
+    <!-- Apply Filters Button -->
+    <button mat-button color="primary" (click)="applyFilters()">Apply Filters</button>
   </form>
-  
-    <!-- Data Table -->
-    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-      
-      <!-- ID Column -->
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef> ID </th>
-        <td mat-cell *matCellDef="let trainee"> 
-            <span class="exams" [ngClass]="{ 'passed': trainee.average >= 65, 'failed': trainee.average < 65 }">
-                {{ trainee.id }}
-            </span>
-        </td>
-      </ng-container>
-  
-      <!-- Name Column -->
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef> Name </th>
-        <td mat-cell *matCellDef="let trainee"> 
-            <span class="exams" [ngClass]="{ 'passed': trainee.average >= 65, 'failed': trainee.average < 65 }">
-                {{ trainee.name }}
-            </span>
-        </td>
-      </ng-container>
-  
-      <!-- Average Column -->
-      <ng-container matColumnDef="average">
-        <th mat-header-cell *matHeaderCellDef> Average </th>
-        <td mat-cell *matCellDef="let trainee">
-            <span class="exams" [ngClass]="{ 'passed': trainee.average >= 65, 'failed': trainee.average < 65 }">
-                {{ trainee.average }}
-              </span>
-            </td>
-      </ng-container>
-  
-      <!-- Status Column -->
-      <ng-container matColumnDef="exams">
-        <th mat-header-cell *matHeaderCellDef> Exams </th>
-        <td mat-cell *matCellDef="let trainee">
-          <span class="exams" [ngClass]="{ 'passed': trainee.average >= 65, 'failed': trainee.average < 65 }">
-            {{ trainee.tests.length }}
-          </span>
-        </td>
-      </ng-container>
-  
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-    </table>
-  
-    <!-- Pagination -->
-    <mat-paginator [length]="dataSource.data.length" [pageSize]="10"></mat-paginator>
-</mat-card>  
+
+  <!-- Trainee List -->
+  <table mat-table [dataSource]="filteredTrainees()" class="trainee-table">
+    <!-- ID Column -->
+    <ng-container matColumnDef="id">
+      <th mat-header-cell *matHeaderCellDef> ID </th>
+      <td mat-cell *matCellDef="let trainee"> {{ trainee.id }} </td>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef> Name </th>
+      <td mat-cell *matCellDef="let trainee"> {{ trainee.name }} </td>
+    </ng-container>
+
+    <!-- Average Column -->
+    <ng-container matColumnDef="average">
+      <th mat-header-cell *matHeaderCellDef> Average </th>
+      <td mat-cell *matCellDef="let trainee"> {{ trainee.average }} </td>
+    </ng-container>
+
+    <!-- Exams Column -->
+    <ng-container matColumnDef="exams">
+      <th mat-header-cell *matHeaderCellDef> Exams </th>
+      <td mat-cell *matCellDef="let trainee"> {{ trainee.exams }} </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['id', 'name', 'average', 'exams']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['id', 'name', 'average', 'exams'];"
+        [ngClass]="{'passed': row.average >= 65, 'failed': row.average < 65}">
+    </tr>
+  </table>
+</mat-card>

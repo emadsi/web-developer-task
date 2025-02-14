@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { ITrainee } from '../models/trainee.model';
-import { MOCK_TRAINEES } from '../mocks/trainees.mock';
+import { ITrainee } from '../../models/trainee.model';
+import { MOCK_TRAINEES } from '../../mocks/trainees.mock';
 
 @Injectable({
   providedIn: 'root'
@@ -12,8 +12,14 @@ export class TraineeService {
   constructor(private http: HttpClient) {}
 
   getAllTrainees(): Observable<ITrainee[]> {
-    // return this.http.get<ITrainee[]>(this.apiUrl);
+    // return this.http.get<ITrainee[]>(this.apiUrl); //
     return of(MOCK_TRAINEES)
+  }
+
+  getSubjects(): Observable<string[]> {
+    const subjects = new Set<string>();
+    MOCK_TRAINEES.forEach(t => t.tests.forEach(test => subjects.add(test.subject)));
+    return of(Array.from(subjects));
   }
 
   getTraineeById(id: number): Observable<ITrainee> {

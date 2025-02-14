@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CommonModule } from '@angular/common';
 import { ITrainee } from '../../models/trainee.model';
-import { TraineeService } from '../../services/trainee.service';
+import { TraineeService } from '../../services/trainee/trainee.service';
 import { MatCardModule } from '@angular/material/card';
 import { ITestResult } from '../../models/testResult.model';
 import { TraineeDetailsComponent } from "../trainee-details/trainee-details.component";
@@ -130,6 +130,7 @@ export class DataPageComponent implements OnInit, AfterViewInit {
       this.fillTraineeForm(trainee, test);
     } else {
       this.traineeForm.reset();
+      this.traineeForm.get('id').enable();
     }
   }
 

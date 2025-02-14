@@ -31,17 +31,18 @@ export const MOCK_TRAINEES: ITrainee[] = [
   },
   {
     id: 3,
-    name: 'Omer Adam',
-    email: 'omer@example.com',
-    address: '789 Main St',
-    city: 'Washington DC',
-    country: 'USA',
-    zip: 10001,
+    name: "David Lee",
+    email: "david.lee@example.com",
+    address: "45 Pine Street",
+    city: "San Francisco",
+    country: "USA",
+    zip: 94103,
     tests: [
-      { id: 101, subject: 'Math', grade: 100, date: '2024-03-01' },
-      { id: 102, subject: 'Science', grade: 70, date: '2024-02-15' }
+      { id: 6, subject: "Physics", grade: 58, date: "2024-01-20" },
+      { id: 7, subject: "Chemistry", grade: 62, date: "2024-02-25" },
+      { id: 8, subject: "Biology", grade: 54, date: "2024-03-12" }
     ],
-    average: 81.5
+    average: 58 // Below 65
   },
   {
     id: 4,
@@ -59,17 +60,18 @@ export const MOCK_TRAINEES: ITrainee[] = [
   },
   {
     id: 5,
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    address: '123 Main St',
-    city: 'New York',
-    country: 'USA',
+    name: "Robert Anderson",
+    email: "robert.anderson@example.com",
+    address: "78 Cedar Road",
+    city: "New York",
+    country: "USA",
     zip: 10001,
     tests: [
-      { id: 101, subject: 'Math', grade: 85, date: '2024-02-01' },
-      { id: 102, subject: 'Science', grade: 78, date: '2024-02-10' }
+      { id: 12, subject: "English", grade: 63, date: "2024-01-10" },
+      { id: 13, subject: "Science", grade: 61, date: "2024-02-15" },
+      { id: 14, subject: "Math", grade: 60, date: "2024-03-08" }
     ],
-    average: 81.5
+    average: 61 // Below 65
   },
   {
     id: 6,
@@ -182,5 +184,77 @@ export const MOCK_TRAINEES: ITrainee[] = [
       { id: 118, subject: 'Math', grade: 76, date: '2024-02-19' }
     ],
     average: 82
+  },
+  {
+    id: 101,
+    name: "Michael Carter",
+    email: "michael.carter@example.com",
+    address: "12 Oak Street",
+    city: "Los Angeles",
+    country: "USA",
+    zip: 90001,
+    tests: [
+      { id: 1, subject: "Math", grade: 50, date: "2024-01-15" },
+      { id: 2, subject: "Science", grade: 60, date: "2024-02-10" },
+      { id: 3, subject: "History", grade: 55, date: "2024-03-05" }
+    ],
+    average: 55 // Below 65
+  },
+  {
+    id: 102,
+    name: "Sarah Johnson",
+    email: "sarah.johnson@example.com",
+    address: "89 Maple Avenue",
+    city: "Chicago",
+    country: "USA",
+    zip: 60601,
+    tests: [
+      { id: 4, subject: "Math", grade: 60, date: "2024-01-12" },
+      { id: 5, subject: "English", grade: 50, date: "2024-02-18" }
+    ],
+    average: 55 // Below 65
+  },
+  {
+    id: 103,
+    name: 'Omer Adam',
+    email: 'omer@example.com',
+    address: '789 Main St',
+    city: 'Washington DC',
+    country: 'USA',
+    zip: 10001,
+    tests: [
+      { id: 101, subject: 'Math', grade: 100, date: '2024-03-01' },
+      { id: 102, subject: 'Science', grade: 70, date: '2024-02-15' }
+    ],
+    average: 81.5
+  },
+  {
+    id: 104,
+    name: "Emily Roberts",
+    email: "emily.roberts@example.com",
+    address: "102 Birch Lane",
+    city: "Houston",
+    country: "USA",
+    zip: 77002,
+    tests: [
+      { id: 9, subject: "Math", grade: 62, date: "2024-01-22" },
+      { id: 10, subject: "History", grade: 59, date: "2024-02-14" },
+      { id: 11, subject: "Geography", grade: 57, date: "2024-03-20" }
+    ],
+    average: 59 // Below 65
+  },
+  {
+    id: 105,
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    address: '123 Main St',
+    city: 'New York',
+    country: 'USA',
+    zip: 10001,
+    tests: [
+      { id: 101, subject: 'Math', grade: 85, date: '2024-02-01' },
+      { id: 102, subject: 'Science', grade: 78, date: '2024-02-10' }
+    ],
+    average: 81.5
   }
 ];
