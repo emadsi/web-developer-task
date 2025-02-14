@@ -1,42 +1,71 @@
 :host {
-
-    display: block;
-    height: 100vh;
-    
-    .mat-card {
+    .data-page-container {
         margin: 20px;
         padding: 20px;
-    }
-    
-    .filter-form {
+      }
+      
+      .filter-form {
+        margin-top: 10px;
         display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-    
-    .table-container {
+        align-items: center;
+      }
+      
+      /* Main Flex Container */
+      .content {
+        display: flex;
+        gap: 20px;
+        margin-top: 20px;
+        align-items: stretch; /* 🔹 Makes both sides equal height */
+        flex-wrap: wrap; /* 🔹 Ensures responsiveness */
+        min-height: 100vh;
+      }
+      
+      /* Table */
+      .table-container {
+        flex: 3;
+        min-width: 600px;
         max-width: 100%;
         overflow-x: auto;
-    }
-    
-    mat-form-field {
-        width: 200px;
-    }
-    
-    .button-group {
         display: flex;
-        gap: 10px;
-        margin-top: 20px;
-    }
-    
-    .detail-panel-container {
-        width: 100%;
-    }
-    
-    mat-sidenav {
-        width: 350px;
-        padding: 20px;
+        flex-direction: column;
+      }
+      
+      /* Trainee Details */
+      .details-container {
+        flex: 1;
+        min-width: 300px;
+        max-width: 400px;
         background: #f9f9f9;
+        border-left: 2px solid #ccc;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      
+      /* Make the table and TraineeDetails the same height */
+      .table-container,
+      .details-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%; /* Ensure both have the same height */
+      }
+      
+      /* Responsive Styles */
+      @media screen and (max-width: 1024px) {
+        .content {
+          flex-direction: column; 
+        }
+      
+        .table-container,
+        .details-container {
+          width: 100%;
+          min-height: auto;
+        }
+      
+        .details-container {
+          border-left: none;
+          border-top: 2px solid #ccc;
+        }
     }      
 }

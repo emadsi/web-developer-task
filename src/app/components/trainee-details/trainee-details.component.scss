@@ -1,0 +1,29 @@
+:host {
+    .trainee-details {
+        max-height: 600px;
+        overflow: auto;
+        background: #f9f9f9;
+        height: 100%; /* 🔹 Matches height of table */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .trainee-details-form {
+        display: flex;
+        flex-direction: column;
+    }
+      
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+      
+    /* Responsive */
+    @media screen and (max-width: 1024px) {
+        .trainee-details {
+          height: auto;
+        }
+    }      
+}

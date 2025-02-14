@@ -1,8 +1,8 @@
-import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -11,6 +11,9 @@ import { ITrainee } from '../../models/trainee.model';
 import { TraineeService } from '../../services/trainee.service';
 import { MatCardModule } from '@angular/material/card';
 import { ITestResult } from '../../models/testResult.model';
+import { TraineeDetailsComponent } from "../trainee-details/trainee-details.component";
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-data-page',
@@ -23,8 +26,9 @@ import { ITestResult } from '../../models/testResult.model';
     MatFormFieldModule,
     MatInputModule,
     ReactiveFormsModule,
-    MatCardModule
-  ],
+    MatCardModule,
+    TraineeDetailsComponent
+],
   templateUrl: './data-page.component.html',
   styleUrls: ['./data-page.component.scss']
 })
@@ -33,16 +37,15 @@ export class DataPageComponent implements OnInit, AfterViewInit {
   dataSource = new MatTableDataSource<{ trainee: ITrainee; test: ITestResult }>([]);
   filterForm!: FormGroup;
   traineeForm!: FormGroup;
-  selectedTrainee: ITrainee | null = null;
+  selectedTrainee: boolean = false;
   isNewTrainee = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
-  @ViewChild('detailsPanel') detailsPanel!: MatSidenav;
 
   constructor(
+    private dialog: MatDialog,
     private traineeService: TraineeService,
-    private fb: FormBuilder,
-    private cdr: ChangeDetectorRef
+    private fb: FormBuilder
   ) {}
 
   ngOnInit(): void {
@@ -122,15 +125,12 @@ export class DataPageComponent implements OnInit, AfterViewInit {
 
   openDetails(trainee: ITrainee | null, test: ITestResult |null, isNew: boolean = false): void {
     this.isNewTrainee = isNew;
+    this.selectedTrainee = true;
     if (trainee) {
       this.fillTraineeForm(trainee, test);
-      this.selectedTrainee = trainee;
     } else {
       this.traineeForm.reset();
-      this.selectedTrainee = null;
     }
-    this.detailsPanel.open();
-    this.cdr.detectChanges();
   }
 
   private fillTraineeForm(trainee: ITrainee, test: ITestResult) {
@@ -149,9 +149,9 @@ export class DataPageComponent implements OnInit, AfterViewInit {
   }
 
   closeDetails(): void {
-    this.detailsPanel.close();
     this.traineeForm.reset();
     this.isNewTrainee = false;
+    this.selectedTrainee = false;
   }
 
   saveTrainee(): void {
@@ -169,6 +169,21 @@ export class DataPageComponent implements OnInit, AfterViewInit {
         });
       }
     }
+  }
+
+  deleteTrainee(trainee: ITrainee): void {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: { message: `Are you sure you want to delete ${trainee.name}?` }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.traineeService.deleteTrainee(trainee.id).subscribe(() => {
+          this.loadTrainees();
+        });
+      }
+    }); 
   }
 }
 
