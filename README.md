@@ -10,8 +10,8 @@ A Single Page Application built with **Angular 17**, **NgRx for state management
 ## 🚀 Setup
 1. Clone the repository:
 ```sh
-git clone https://github.com/your-repo/test-results-app.git
-cd test-results-app
+git clone https://github.com/emadsi/web-developer-task.git
+cd web-developer-task
 ```
 2. Install dependencies:
 ```sh
